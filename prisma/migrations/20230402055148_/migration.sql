@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Post" ALTER COLUMN "old" SET DEFAULT ARRAY[]::INTEGER[];

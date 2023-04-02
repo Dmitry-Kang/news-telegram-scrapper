@@ -11,20 +11,44 @@ generator client {
 }
 
 // data models
-model Post {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String?
-  views     Int     @default(0)
-  published Boolean @default(false)
-  author    User?   @relation(fields: [author_id], references: [id])
-  author_id Int?
-}
 
 model User {
-  id           Int     @id @default(autoincrement())
-  telegramId   Int     @unique
+  id           Int         @id @default(autoincrement())
+  telegramId   Int         @unique
   telegramName String
   subscribed   Boolean
-  posts        Post[]
+  role         String
+  sites        UserSites[]
+}
+
+model UserSites {
+  user       User     @relation(fields: [userid], references: [id])
+  userid     Int
+  site       Site     @relation(fields: [siteid], references: [id])
+  siteid     Int
+  assignedAt DateTime @default(now())
+  assignedBy String
+
+  @@id([userid, siteid])
+}
+
+model Site {
+  id       Int         @id @default(autoincrement())
+  name     String
+  url      String
+  lastPost String
+  users    UserSites[]
+  posts    Post[]
+}
+
+model Post {
+  id     Int    @id @default(autoincrement())
+  title  String
+  text   String
+  img    String
+  url    String @unique
+  site   Site   @relation(fields: [siteid], references: [id])
+  siteid Int
+  old    Int[]
+  date   DateTime @default(now())
 }
