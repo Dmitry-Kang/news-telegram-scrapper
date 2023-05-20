@@ -8,6 +8,7 @@ import { MediaGroup } from 'telegraf/typings/telegram-types';
 import getPostsFromOmskInform from './sites/omskinform'
 import getPostsFromUralWeb from './sites/uralweb'
 import getPostsFromVzsar from './sites/vzsar'
+import getPostsFromRostovGazeta from './sites/rostovgazeta'
 // const axios = require('axios');
 // const cheerio = require('cheerio');
 dotenv.config();
@@ -39,34 +40,9 @@ async function getPostTitles() {
       } else if (site.name === "uralweb") { // ural
         // res = await getPostsFromUralWeb(site, $)
       } else if (site.name === "vzsar") { // vzsar
-        res = await getPostsFromVzsar(site, $)
+        // res = await getPostsFromVzsar(site, $)
       } else if (site.name === "rostovgazeta") { // rostovgazeta
-        // $('.mx-auto > .mb-8 > a').each( (_i, el) => {
-        //     const postTitle = $(el).attr('href')
-        //     postTitles.push(postTitle?postTitle:"") 
-        //   });
-        //   await Promise.all(postTitles.map(async el => {
-        //     // try {
-        //       const { data } = await axios.get("https://rostovgazeta.ru" + el);
-        //       const $ = cheerio.load(data);
-        //       const title = $('.MatterTop_title__fNgrs').text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/g, ' ');
-        //       let text = $('.Common_common__MfItd').text().trim().replace(/\[.*\]/g, '')  //.text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/gm,"\n\n");
-        //       // $('.full .seealso_banner').each(function (i, elem) {
-        //       //   text.replace($(this).text().trim(), '');
-        //       // })
-        //       // $('.full i').each(function (i, elem) {
-        //       //   text.replace($(this).text().trim(), '');
-        //       // })
-        //       let img:string[] = []
-        //       // img.push("https://www.vzsar.ru" + $('.newshead > img.img').attr('src'))
-        //       $('.MatterTop_layer__c__zR').each(function (i, elem) {
-        //         img.push("https://rostovgazeta.ru" + $(this).attr('src'))
-        //         console.log('suka')
-        //       })
-        //       res.push({title, text: JSON.stringify({text: text}), img: img || '' , url: "https://rostovgazeta.ru", siteid: site.id, old: false})
-        //     // } catch {console.log("poebatb")}
-              
-        //   }))
+        res = await getPostsFromRostovGazeta(site, $)
       } else if (site.name === "sarnovosti") { // sarnovosti
         // $('.main-column > div .news-block__title').each( (_i, el) => {
         //     const postTitle = $(el).attr('href')
