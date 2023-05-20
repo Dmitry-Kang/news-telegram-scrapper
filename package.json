@@ -6,7 +6,7 @@
     "typescript": "^5.0.2"
   },
   "scripts": {
-    "start": "npx ts-node app.ts",
+    "start": "node app.js",
     "prisma:format": "prisma format",
     "prisma:reset": "prisma migrate reset --force",
     "prisma:validate": "prisma validate",

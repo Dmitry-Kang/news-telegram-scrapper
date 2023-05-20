@@ -1,34 +1,29 @@
-import axios from 'axios';
-import cheerio, { Cheerio } from 'cheerio';
-import prisma from '../utils/prisma'
-import { Prisma } from '@prisma/client';
+const axios = require('axios');
+const cheerio = require('cheerio');
 
 
-export default async function getPosts(site: any, $: any):Promise<Prisma.PostCreateManyInput[]> {
-    const postTitles: string[] = []
-    let res: { title: string; text: string; img: string[];video: string[]; url: string; istochnik: string, siteid: any; old: boolean; }[] = []
-    $('.n_news > a').each( (_i:any , el:any ) => {
+module.exports = async function getPosts(site, $) {
+    const postTitles = []
+    let res = []
+    $('.n_news > a').each( (_i , el ) => {
       const postTitle = $(el).attr('href')
       postTitles.push(postTitle?postTitle:"") 
     });
-    await Promise.all(postTitles.map(async (sitepost:any) => {
+    await Promise.all(postTitles.map(async (sitepost) => {
       try {
         const { data } = await axios.get(sitepost);
         const $ = cheerio.load(data);
         const title = $('.n_cap_lnk_one').text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/g, ' ').trim();
         let text = $('.n_text_lnk > p').text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/gm,"\n\n").trim();
-        // $('.nt_img_handler').each(function (i, elem) {
-        //   text = text.replace($(this).text().trim(), '')
-        // })
         
-        let img: (string)[] = [];
+        let img = [];
         $('.nt_img_handler img').each(function (i, elem) {
           const el = $(this).attr('src')
           if (!!el) {
             img.push(el)
           }
         })
-        let video: (string)[] = [];
+        let video = [];
         $('.n_text_lnk > div > iframe').each(function (i, elem) {
           const el = $(this).attr('src')
           if (!!el) {
@@ -47,7 +42,6 @@ export default async function getPosts(site: any, $: any):Promise<Prisma.PostCre
         console.log("poebatb")
       }
     }))
-    // console.log(res)
     return res
       
 }

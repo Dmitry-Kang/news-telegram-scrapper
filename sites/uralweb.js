@@ -1,17 +1,15 @@
-import axios from 'axios';
-import cheerio, { Cheerio } from 'cheerio';
-import prisma from '../utils/prisma'
-import { Prisma } from '@prisma/client';
+const axios = require('axios');
+const cheerio = require('cheerio');
 
 
-export default async function getPosts(site: any, $: any):Promise<Prisma.PostCreateManyInput[]> {
-    const postTitles: string[] = []
-    let res: { title: string; text: string; img: string[];video: string[]; url: string; istochnik: string, siteid: any; old: boolean; }[] = []
-    $('.news-box li .last-nn-box h3 > a').each( (_i:any , el:any ) => {
+module.exports = async function getPosts(site, $) {
+    const postTitles = []
+    let res = []
+    $('.news-box li .last-nn-box h3 > a').each( (_i , el ) => {
       const postTitle = $(el).attr('href')
       postTitles.push(postTitle?postTitle:"") 
     });
-    await Promise.all(postTitles.map(async (sitepost:any) => {
+    await Promise.all(postTitles.map(async (sitepost) => {
       try {
         const { data } = await axios.get("https://www.uralweb.ru" + sitepost);
         const $ = cheerio.load(data);
@@ -22,21 +20,17 @@ export default async function getPosts(site: any, $: any):Promise<Prisma.PostCre
           text += $(this).text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/gm,"\n\n") + '\n\n';
         });
         text = text.replace(/\s{2,}/gm,"\n\n") 
-        // $("blockquote p").each(function (i, elem) { // хз
-        //   text = text.replace($(this).text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/gm,"\n\n"), "");
-        // });
         
-        let img: string[] = [];
+        let img = [];
         $(".ni-bimg > img").each(function (i, elem) {
           img.push("https:" + $(this).attr("src"));
         });
-        $(".noted-img > img").each(function (i, elem) { // не ебу почему не работает. возможно он подгружается при скроле
+        $(".noted-img > img").each(function (i, elem) { // todo не ебу почему не работает. возможно он подгружается при скроле
           console.log("pls")
           img.push("https:" + $(this).attr("src"));
         });
-        
 
-        let video: string[] = [];
+        let video = [];
         $('.youtube-player.video-player > iframe').each(function (i, elem) {
           const el = $(this).attr('src')
           if (!!el) {
@@ -58,7 +52,6 @@ export default async function getPosts(site: any, $: any):Promise<Prisma.PostCre
         console.log("poebatb")
       }
     }))
-    // console.log(res)
     return res
       
 }

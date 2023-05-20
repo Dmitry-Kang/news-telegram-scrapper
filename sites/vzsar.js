@@ -1,18 +1,16 @@
-import axios from 'axios';
-import cheerio, { Cheerio } from 'cheerio';
-import prisma from '../utils/prisma'
-import { Prisma } from '@prisma/client';
-import iconv from 'iconv-lite';
+const axios = require('axios');
+const cheerio = require('cheerio');
+const iconv = require('iconv-lite');
 
 
-export default async function getPosts(site: any, $: any):Promise<Prisma.PostCreateManyInput[]> {
-    const postTitles: string[] = []
-    let res: { title: string; text: string; img: string[];video: string[]; url: string; istochnik: string, siteid: any; old: boolean; }[] = []
-    $('.newslist > a').each( (_i:any , el:any ) => {
+module.exports = async function getPosts(site, $) {
+    const postTitles = []
+    let res = []
+    $('.newslist > a').each( (_i , el ) => {
       const postTitle = $(el).attr('href')
       postTitles.push(postTitle?postTitle:"") 
     });
-    await Promise.all(postTitles.map(async (sitepost:any) => {
+    await Promise.all(postTitles.map(async (sitepost) => {
       try {
         const response = await axios.get('https://www.vzsar.ru' + sitepost, { responseType: 'arraybuffer' });
         const data = iconv.decode(response.data, 'win1251'); // блядская адская поебота
@@ -28,14 +26,8 @@ export default async function getPosts(site: any, $: any):Promise<Prisma.PostCre
           }
         })
         text = text.replace(/\s{2,}/gm,"\n\n") 
-        // $('.full .seealso_banner').each(function (i, elem) {
-        //   text.replace($(this).text().trim(), '');
-        // })
-        // $('.full i').each(function (i, elem) {
-        //   text.replace($(this).text().trim(), '');
-        // })
 
-        let img: string[] = []
+        let img = []
         $('.newshead > img.img').each(function (i, elem) {
           img.push("https://www.vzsar.ru" + $(this).attr('src'))
         })
@@ -60,7 +52,6 @@ export default async function getPosts(site: any, $: any):Promise<Prisma.PostCre
         console.log("poebatb")
       }
     }))
-    // console.log(res)
     return res
       
 }

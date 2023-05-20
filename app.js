@@ -1,33 +1,29 @@
-import { Telegraf } from 'telegraf';
-import dotenv from 'dotenv';
-import prisma from './utils/prisma'
-import { Prisma } from '@prisma/client';
-import axios from 'axios';
-import cheerio, { Cheerio } from 'cheerio';
-import { MediaGroup } from 'telegraf/typings/telegram-types';
-import getPostsFromOmskInform from './sites/omskinform'
-import getPostsFromUralWeb from './sites/uralweb'
-import getPostsFromVzsar from './sites/vzsar'
-import getPostsFromRostovGazeta from './sites/rostovgazeta'
-import getPostsFromSarnovosti from './sites/sarnovosti'
-// const axios = require('axios');
-// const cheerio = require('cheerio');
+const { Telegraf } = require('telegraf');
+const dotenv = require('dotenv');
+const prisma = require('./utils/prisma');
+const axios = require('axios');
+const cheerio = require('cheerio');
+const getPostsFromOmskInform = require('./sites/omskinform');
+const getPostsFromUralWeb = require('./sites/uralweb');
+const getPostsFromVzsar = require('./sites/vzsar');
+const getPostsFromRostovGazeta = require('./sites/rostovgazeta');
+const getPostsFromSarnovosti = require('./sites/sarnovosti');
 dotenv.config();
 
-let options:any = {
+let options = {
   channelMode: true    // Handle `channel_post` updates as messages (optional)
 }
 
 const bot = new Telegraf(process.env.TELEGRAM_TOKEN || '', options);
 
-function delay(ms: number) {
+function delay(ms) {
   return new Promise( resolve => setTimeout(resolve, ms) );
 }
 
 async function getPostTitles() {
 	try {
     const sites = await prisma.site.findMany();
-    let res:Prisma.PostCreateManyInput[] = [];
+    let res = [];
     await Promise.all(sites.map(async site => {
       const { data } = await axios.get(
         site.url
@@ -96,7 +92,7 @@ async function send_news_groups() {
   
 }
 
-async function send_shit(post:any, chatId:any) {
+async function send_shit(post, chatId) {
   await bot.telegram.sendMessage(chatId, `Пост ${post.id}`, {disable_web_page_preview: true}) // айди поста
   await delay(1000)
 
@@ -115,7 +111,7 @@ async function send_shit(post:any, chatId:any) {
   }
   await delay(1000)
 
-  const jsontext = JSON.parse(post.text as string).text // заголовок, текст, ссылка и источник
+  const jsontext = JSON.parse(post.text).text // заголовок, текст, ссылка и источник
   const text = (`${post.title}\n\n${jsontext}\n\n${post.url}\n\n${post.istochnik}`)
   if (text.length > 4096) {
     for (let i = 0; i < text.length; i += 4096) {

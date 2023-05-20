@@ -1,17 +1,15 @@
-import axios from 'axios';
-import cheerio, { Cheerio } from 'cheerio';
-import prisma from '../utils/prisma'
-import { Prisma } from '@prisma/client';
+const axios = require('axios');
+const cheerio = require('cheerio');
 
 
-export default async function getPosts(site: any, $: any):Promise<Prisma.PostCreateManyInput[]> {
-    const postTitles: string[] = []
-    let res: { title: string; text: string; img: string[];video: string[]; url: string; istochnik: string, siteid: any; old: boolean; }[] = []
-    $('.main-column > div .news-block__title').each( (_i:any , el:any ) => {
+module.exports = async function getPosts(site, $) {
+    const postTitles = []
+    let res = []
+    $('.main-column > div .news-block__title').each( (_i , el ) => {
       const postTitle = $(el).attr('href')
       postTitles.push(postTitle?postTitle:"") 
     });
-    await Promise.all(postTitles.map(async (sitepost:any) => {
+    await Promise.all(postTitles.map(async (sitepost) => {
       try {
         const { data } = await axios.get("https://sarnovosti.ru" + sitepost);
         const $ = cheerio.load(data);
@@ -23,7 +21,7 @@ export default async function getPosts(site: any, $: any):Promise<Prisma.PostCre
         });
         text = text.replace(/\s{2,}/gm,"\n\n") 
         
-        let img: string[] = [];
+        let img = [];
         $(".main-column > article > img").each(function (i, elem) {
           img.push("https://sarnovosti.ru" + $(this).attr("src"));
         });
@@ -32,7 +30,7 @@ export default async function getPosts(site: any, $: any):Promise<Prisma.PostCre
         });
         
 
-        let video: string[] = [];
+        let video = [];
         $(".main-column > article > [itemprop = 'articleBody'] > .iframe > iframe").each(function (i, elem) {
           const el = $(this).attr('src')
           if (!!el) {
@@ -54,7 +52,6 @@ export default async function getPosts(site: any, $: any):Promise<Prisma.PostCre
         console.log("poebatb")
       }
     }))
-    // console.log(res)
     return res
       
 }
