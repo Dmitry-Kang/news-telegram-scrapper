@@ -5,6 +5,9 @@ import { Prisma } from '@prisma/client';
 import axios from 'axios';
 import cheerio, { Cheerio } from 'cheerio';
 import { MediaGroup } from 'telegraf/typings/telegram-types';
+import getPostsFromOmskInform from './sites/omskinform'
+import getPostsFromUralWeb from './sites/uralweb'
+import getPostsFromVzsar from './sites/vzsar'
 // const axios = require('axios');
 // const cheerio = require('cheerio');
 dotenv.config();
@@ -22,154 +25,84 @@ function delay(ms: number) {
 async function getPostTitles() {
 	try {
     const sites = await prisma.site.findMany();
-    const res:Prisma.PostCreateManyInput[]= []
+    let res:Prisma.PostCreateManyInput[] = [];
     await Promise.all(sites.map(async site => {
       const { data } = await axios.get(
         site.url
       );
       const $ = cheerio.load(data);
-      const postTitles: string[] = []
+      
 
       // омск1 omskinform
       if (site.name === "omskinform") {
-        // $('.n_news > a').each( (_i, el) => {
+        // res = await getPostsFromOmskInform(site, $)
+      } else if (site.name === "uralweb") { // ural
+        // res = await getPostsFromUralWeb(site, $)
+      } else if (site.name === "vzsar") { // vzsar
+        res = await getPostsFromVzsar(site, $)
+      } else if (site.name === "rostovgazeta") { // rostovgazeta
+        // $('.mx-auto > .mb-8 > a').each( (_i, el) => {
         //     const postTitle = $(el).attr('href')
         //     postTitles.push(postTitle?postTitle:"") 
         //   });
         //   await Promise.all(postTitles.map(async el => {
-        //     try {
-        //       const { data } = await axios.get(el);
+        //     // try {
+        //       const { data } = await axios.get("https://rostovgazeta.ru" + el);
         //       const $ = cheerio.load(data);
-        //       const title = $('.n_cap_lnk_one').text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/g, ' ');
-        //       let text = $('.n_text_lnk').text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/gm,"\n\n");
-        //       $('.nt_img_handler').each(function (i, elem) {
-        //         text = text.replace($(this).text().trim(), '')
+        //       const title = $('.MatterTop_title__fNgrs').text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/g, ' ');
+        //       let text = $('.Common_common__MfItd').text().trim().replace(/\[.*\]/g, '')  //.text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/gm,"\n\n");
+        //       // $('.full .seealso_banner').each(function (i, elem) {
+        //       //   text.replace($(this).text().trim(), '');
+        //       // })
+        //       // $('.full i').each(function (i, elem) {
+        //       //   text.replace($(this).text().trim(), '');
+        //       // })
+        //       let img:string[] = []
+        //       // img.push("https://www.vzsar.ru" + $('.newshead > img.img').attr('src'))
+        //       $('.MatterTop_layer__c__zR').each(function (i, elem) {
+        //         img.push("https://rostovgazeta.ru" + $(this).attr('src'))
+        //         console.log('suka')
         //       })
-              
-        //       const img = $('.nt_img_handler img').attr('src')
-        //       res.push({title, text: JSON.stringify({text: text}), img: img || '' , url: site.url, siteid: site.id, old: false})
-        //     } catch {console.log("poebatb")}
+        //       res.push({title, text: JSON.stringify({text: text}), img: img || '' , url: "https://rostovgazeta.ru", siteid: site.id, old: false})
+        //     // } catch {console.log("poebatb")}
               
         //   }))
-      } else if (site.name === "uralweb") { // ural
-        $('.news-box li .last-nn-box h3 > a').each( (_i, el) => {
-            const postTitle = $(el).attr('href')
-            postTitles.push(postTitle?postTitle:"") 
-          });
-          await Promise.all(postTitles.map(async el => {
-            // try {
-              const { data } = await axios.get("https://www.uralweb.ru" + el);
-              const $ = cheerio.load(data);
-              const title = $('.clearfix h1').text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/g, ' ');
-              let text1 = ''  //.text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/gm,"\n\n");
-              $('.n-ict.clearfix').each(function (i, elem) {
-                text1 += $(this).text().trim().replace(/\[.*\]/g, '') + "\n";
-              })
-              let text = ''  //
-              $('.news-detail-body p').each(function (i, elem) {
-                text += $(this).text().trim().replace(/\[.*\]/g, '').replace(/\n{1}/gm,"") + "\n";
-              })
-              $('blockquote p').each(function (i, elem) {
-                text = text.replace($(this).text().trim(), '')
-              })
-              let img = []
-              img.push("https:" + $('.ni-bimg > img').attr('src'))
-              $('.noted-img > img').each(function (i, elem) {
-                img.push("https:" + $(this).attr('src'))
-                console.log('suka')
-              })
-              res.push({title, text: JSON.stringify({text: text1 + text}), img: img || '' , url: "Источник: uralweb", siteid: site.id, old: false})
-            // } catch {console.log("poebatb")}
-              
-          }))
-      } else if (site.name === "vzsar") { // vzsar
-        $('.newslist > a').each( (_i, el) => {
-            const postTitle = $(el).attr('href')
-            postTitles.push(postTitle?postTitle:"") 
-          });
-          await Promise.all(postTitles.map(async el => {
-            // try {
-              const { data } = await axios.get("https://www.vzsar.ru" + el);
-              const $ = cheerio.load(data);
-              const title = $('.newshead h1').text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/g, ' ');
-              let text = $('.full').text().trim().replace(/\[.*\]/g, '')  //.text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/gm,"\n\n");
-              $('.full .seealso_banner').each(function (i, elem) {
-                text.replace($(this).text().trim(), '');
-              })
-              $('.full i').each(function (i, elem) {
-                text.replace($(this).text().trim(), '');
-              })
-              let img = []
-              img.push("https://www.vzsar.ru" + $('.newshead > img.img').attr('src'))
-              $('.fancybox-slider > .fancybox-slide img').each(function (i, elem) {
-                img.push("https://www.vzsar.ru" + $(this).attr('src'))
-                console.log('suka')
-              })
-              res.push({title, text: JSON.stringify({text: text}), img: img || '' , url: "https://www.vzsar.ru", siteid: site.id, old: false})
-            // } catch {console.log("poebatb")}
-              
-          }))
-      } else if (site.name === "rostovgazeta") { // rostovgazeta
-        $('.mx-auto > .mb-8 > a').each( (_i, el) => {
-            const postTitle = $(el).attr('href')
-            postTitles.push(postTitle?postTitle:"") 
-          });
-          await Promise.all(postTitles.map(async el => {
-            // try {
-              const { data } = await axios.get("https://rostovgazeta.ru" + el);
-              const $ = cheerio.load(data);
-              const title = $('.MatterTop_title__fNgrs').text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/g, ' ');
-              let text = $('.Common_common__MfItd').text().trim().replace(/\[.*\]/g, '')  //.text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/gm,"\n\n");
-              // $('.full .seealso_banner').each(function (i, elem) {
-              //   text.replace($(this).text().trim(), '');
-              // })
-              // $('.full i').each(function (i, elem) {
-              //   text.replace($(this).text().trim(), '');
-              // })
-              let img:string[] = []
-              // img.push("https://www.vzsar.ru" + $('.newshead > img.img').attr('src'))
-              $('.MatterTop_layer__c__zR').each(function (i, elem) {
-                img.push("https://rostovgazeta.ru" + $(this).attr('src'))
-                console.log('suka')
-              })
-              res.push({title, text: JSON.stringify({text: text}), img: img || '' , url: "https://rostovgazeta.ru", siteid: site.id, old: false})
-            // } catch {console.log("poebatb")}
-              
-          }))
       } else if (site.name === "sarnovosti") { // sarnovosti
-        $('.main-column > div .news-block__title').each( (_i, el) => {
-            const postTitle = $(el).attr('href')
-            postTitles.push(postTitle?postTitle:"") 
-          });
-          await Promise.all(postTitles.map(async el => {
-            // try {
-              const { data } = await axios.get("https://sarnovosti.ru" + el);
-              const $ = cheerio.load(data);
-              const title = $('.main-column > article > h1').text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/g, ' ');
-              let text = $(".main-column > article > [itemprop = 'articleBody']").text().trim().replace(/\[.*\]/g, '')  //.text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/gm,"\n\n");
-              // $('.full .seealso_banner').each(function (i, elem) {
-              //   text.replace($(this).text().trim(), '');
+        // $('.main-column > div .news-block__title').each( (_i, el) => {
+        //     const postTitle = $(el).attr('href')
+        //     postTitles.push(postTitle?postTitle:"") 
+        //   });
+        //   await Promise.all(postTitles.map(async el => {
+        //     // try {
+        //       const { data } = await axios.get("https://sarnovosti.ru" + el);
+        //       const $ = cheerio.load(data);
+        //       const title = $('.main-column > article > h1').text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/g, ' ');
+        //       let text = $(".main-column > article > [itemprop = 'articleBody']").text().trim().replace(/\[.*\]/g, '')  //.text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/gm,"\n\n");
+        //       // $('.full .seealso_banner').each(function (i, elem) {
+        //       //   text.replace($(this).text().trim(), '');
+        //       // })
+        //       // $('.full i').each(function (i, elem) {
+        //       //   text.replace($(this).text().trim(), '');
+        //       // })
+        //       let img:string[] = []
+        //       // img.push("https://www.vzsar.ru" + $('.newshead > img.img').attr('src'))
+              // $('.main-column > article img').each(function (i, elem) {
+              //   img.push("https://sarnovosti.ru" + $(this).attr('src'))
+              //   console.log('suka')
               // })
-              // $('.full i').each(function (i, elem) {
-              //   text.replace($(this).text().trim(), '');
-              // })
-              let img:string[] = []
-              // img.push("https://www.vzsar.ru" + $('.newshead > img.img').attr('src'))
-              $('.main-column > article img').each(function (i, elem) {
-                img.push("https://sarnovosti.ru" + $(this).attr('src'))
-                console.log('suka')
-              })
-              res.push({title, text: JSON.stringify({text: text}), img: img || '' , url: "https://sarnovosti.ru", siteid: site.id, old: false})
-            // } catch {console.log("poebatb")}
+        //       res.push({title, text: JSON.stringify({text: text}), img: img || '' , url: "https://sarnovosti.ru", siteid: site.id, old: false})
+        //     // } catch {console.log("poebatb")}
               
-          }))
+        //   }))
       }
     }))
+    // console.log(res)
     await prisma.post.createMany({
-      data: res ,
+      data: res,
       skipDuplicates: true
     })
 	} catch (error) {
+    console.log('ree')
 		throw error;
 	}
 };
@@ -193,24 +126,19 @@ async function send_news_groups() {
   })
   posts.reduce(async (memo, post) => {
     await memo;
-
+    let chatId;
     if (post.siteid === 1) { //омск 1 omskinform -1001911238782
-      const chatId = "-1001911238782"
-      await send_shit(post, chatId)
+      chatId = "-1001911238782"
     } else if (post.siteid === 2) { // урал екб 1 -1001924665554
-      const chatId = "-1001924665554"
-      await send_shit(post, chatId)
+      chatId = "-1001924665554"
     } else if (post.siteid === 3) { // саратов 1 -1001934213159
-      const chatId = "-1001934213159"
-      await send_shit(post, chatId)
+      chatId = "-1001934213159"
     } else if (post.siteid === 4) { // rostov -1001956243574
-      const chatId = "-1001956243574"
-      await send_shit(post, chatId) 
+      chatId = "-1001956243574"
     } else if (post.siteid === 5) { // rostov 2 -1001946671569
-      const chatId = "-1001946671569"
-      await send_shit(post, chatId) 
+      chatId = "-1001946671569"
     }
-    
+    await send_shit(post, chatId)
     await delay(5 * 1000)
 
   }, Promise.resolve())
@@ -218,29 +146,34 @@ async function send_news_groups() {
 }
 
 async function send_shit(post:any, chatId:any) {
-  if (post.img.length > 0) {
-    let res:MediaGroup = post.img.map((el:string) => {
-      return {type: 'photo', media: el}
-    })
-    post.img.forEach((element:string) => {
-      // res.push({type:'photo', media: element})
-      
-    });
-    await bot.telegram.sendMediaGroup(chatId, res)
-  } else {
-    await bot.telegram.sendPhoto(chatId, post.img)
+  await bot.telegram.sendMessage(chatId, `Пост ${post.id}`, {disable_web_page_preview: true}) // айди поста
+  await delay(1000)
+
+  if (post.img.length > 0) { // фото или видео
+    // let res:MediaGroup = post.img.map((el:string) => { // высылать именно картинками
+    //   return {type: 'photo', media: el}
+    // })
+    // await bot.telegram.sendMediaGroup(chatId, res)
+    const images = post.img.join("\n")
+    await bot.telegram.sendMessage(chatId, `Картинки:\n${images}`, {disable_web_page_preview: true})
+  } 
+  await delay(1000)
+  if (post.video.length > 0) {
+    const videos = post.video.join("\n")
+    await bot.telegram.sendMessage(chatId, `Видео:\n${videos}`, {disable_web_page_preview: true})
   }
-  await delay(500)
-  const jsontext = JSON.parse(post.text as string).text
-  const text = (`${post.title}\n\n${jsontext}\n\n${post.url}`)
+  await delay(1000)
+
+  const jsontext = JSON.parse(post.text as string).text // заголовок, текст, ссылка и источник
+  const text = (`${post.title}\n\n${jsontext}\n\n${post.url}\n\n${post.istochnik}`)
   if (text.length > 4096) {
     for (let i = 0; i < text.length; i += 4096) {
       await bot.telegram.sendMessage(chatId, text.slice(i, i + 4096), {disable_web_page_preview: true})
-      await delay(500)
+      await delay(1000)
     }
   } else {
     await bot.telegram.sendMessage(chatId, text, {disable_web_page_preview: true})
-    await delay(500)
+    await delay(1000)
   }
 }
 

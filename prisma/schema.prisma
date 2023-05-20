@@ -20,13 +20,15 @@ model Site {
 }
 
 model Post {
-  id     Int    @id @default(autoincrement())
-  title  String @unique
-  text   Json
-  img    String[]
-  url    String
-  site   Site   @relation(fields: [siteid], references: [id])
-  siteid Int
-  old    Boolean
-  date   DateTime @default(now())
+  id        Int    @id @default(autoincrement())
+  title     String @unique
+  text      Json
+  img       String[]
+  video     String[]
+  url       String
+  istochnik String @default("")
+  site      Site   @relation(fields: [siteid], references: [id])
+  siteid    Int
+  old       Boolean
+  date      DateTime @default(now())
 }
