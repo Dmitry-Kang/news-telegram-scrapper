@@ -9,6 +9,7 @@ import getPostsFromOmskInform from './sites/omskinform'
 import getPostsFromUralWeb from './sites/uralweb'
 import getPostsFromVzsar from './sites/vzsar'
 import getPostsFromRostovGazeta from './sites/rostovgazeta'
+import getPostsFromSarnovosti from './sites/sarnovosti'
 // const axios = require('axios');
 // const cheerio = require('cheerio');
 dotenv.config();
@@ -34,45 +35,19 @@ async function getPostTitles() {
       const $ = cheerio.load(data);
       
 
-      // омск1 omskinform
-      if (site.name === "omskinform") {
-        // res = await getPostsFromOmskInform(site, $)
+      
+      if (site.name === "omskinform") { // омск1 omskinform
+        res = await getPostsFromOmskInform(site, $)
       } else if (site.name === "uralweb") { // ural
-        // res = await getPostsFromUralWeb(site, $)
+        res = await getPostsFromUralWeb(site, $)
       } else if (site.name === "vzsar") { // vzsar
-        // res = await getPostsFromVzsar(site, $)
+        res = await getPostsFromVzsar(site, $)
       } else if (site.name === "rostovgazeta") { // rostovgazeta
         res = await getPostsFromRostovGazeta(site, $)
       } else if (site.name === "sarnovosti") { // sarnovosti
-        // $('.main-column > div .news-block__title').each( (_i, el) => {
-        //     const postTitle = $(el).attr('href')
-        //     postTitles.push(postTitle?postTitle:"") 
-        //   });
-        //   await Promise.all(postTitles.map(async el => {
-        //     // try {
-        //       const { data } = await axios.get("https://sarnovosti.ru" + el);
-        //       const $ = cheerio.load(data);
-        //       const title = $('.main-column > article > h1').text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/g, ' ');
-        //       let text = $(".main-column > article > [itemprop = 'articleBody']").text().trim().replace(/\[.*\]/g, '')  //.text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/gm,"\n\n");
-        //       // $('.full .seealso_banner').each(function (i, elem) {
-        //       //   text.replace($(this).text().trim(), '');
-        //       // })
-        //       // $('.full i').each(function (i, elem) {
-        //       //   text.replace($(this).text().trim(), '');
-        //       // })
-        //       let img:string[] = []
-        //       // img.push("https://www.vzsar.ru" + $('.newshead > img.img').attr('src'))
-              // $('.main-column > article img').each(function (i, elem) {
-              //   img.push("https://sarnovosti.ru" + $(this).attr('src'))
-              //   console.log('suka')
-              // })
-        //       res.push({title, text: JSON.stringify({text: text}), img: img || '' , url: "https://sarnovosti.ru", siteid: site.id, old: false})
-        //     // } catch {console.log("poebatb")}
-              
-        //   }))
+        res = await getPostsFromSarnovosti(site, $)
       }
     }))
-    // console.log(res)
     await prisma.post.createMany({
       data: res,
       skipDuplicates: true
