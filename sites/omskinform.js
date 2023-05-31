@@ -1,15 +1,26 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
+function delay(ms) {
+  return new Promise( resolve => setTimeout(resolve, ms) );
+}
 
-module.exports = async function getPosts(site, $) {
+module.exports = async function getPosts(site, all_posts) {
+    const { data } = await axios.get(
+      site.url
+    );
+    const $ = cheerio.load(data);
     const postTitles = []
     let res = []
     $('.n_news > a').each( (_i , el ) => {
       const postTitle = $(el).attr('href')
-      postTitles.push(postTitle?postTitle:"") 
+      if (all_posts.filter(el => el.url == postTitle).length < 1) {
+        postTitles.push(postTitle?postTitle:"")
+      }
+       
     });
-    await Promise.all(postTitles.map(async (sitepost) => {
+    await postTitles.reduce(async (memo, sitepost) => {
+      await memo
       try {
         const { data } = await axios.get(sitepost);
         const $ = cheerio.load(data);
@@ -36,12 +47,22 @@ module.exports = async function getPosts(site, $) {
             video.push(el)
           }
         })
-        res.push({title, text: JSON.stringify({text: text}), img: img, video: video, url: sitepost, istochnik:`Источник: omskinform.ru`, siteid: site.id, old: false})
+        res.push({
+          title, 
+          text: JSON.stringify({text: text}), 
+          img: img, 
+          video: video, 
+          url: sitepost, 
+          istochnik:`Источник: omskinform.ru`, 
+          siteid: site.id, 
+          old: false
+        })
 
-      } catch {
-        console.log("poebatb")
+      } catch(e) {
+        console.log("poebatb",e)
       }
-    }))
+      await delay(1 * 1000)
+    }, Promise.resolve())
     return res
       
 }

@@ -23,26 +23,22 @@ function delay(ms) {
 async function getPostTitles() {
 	try {
     const sites = await prisma.site.findMany();
+    const all_posts = await prisma.post.findMany();
     let res = [];
     await Promise.all(sites.map(async site => {
-      const { data } = await axios.get(
-        site.url
-      );
-      const $ = cheerio.load(data);
-      
-
-      
+      console.log('1:',site)
       if (site.name === "omskinform") { // омск1 omskinform
-        res = await getPostsFromOmskInform(site, $)
+        res = await getPostsFromOmskInform(site, all_posts)
       } else if (site.name === "uralweb") { // ural
-        res = await getPostsFromUralWeb(site, $)
+        res = await getPostsFromUralWeb(site, all_posts)
       } else if (site.name === "vzsar") { // vzsar
-        res = await getPostsFromVzsar(site, $)
+        res = await getPostsFromVzsar(site, all_posts)
       } else if (site.name === "rostovgazeta") { // rostovgazeta
-        res = await getPostsFromRostovGazeta(site, $)
+        res = await getPostsFromRostovGazeta(site, all_posts)
       } else if (site.name === "sarnovosti") { // sarnovosti
-        res = await getPostsFromSarnovosti(site, $)
+        res = await getPostsFromSarnovosti(site, all_posts)
       }
+      console.log('1:',site, "finish")
     }))
     await prisma.post.createMany({
       data: res,
@@ -71,7 +67,7 @@ async function send_news_groups() {
       old: true
     }
   })
-  posts.reduce(async (memo, post) => {
+  await posts.reduce(async (memo, post) => {
     await memo;
     let chatId;
     if (post.siteid === 1) { //омск 1 omskinform -1001911238782
@@ -128,24 +124,31 @@ async function delete_old_news() {
   await prisma.post.deleteMany({
     where: {
       date: {
-        lte: new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
+        lte: new Date(new Date().getTime() - 21 * 24 * 60 * 60 * 1000)
       }
     }
   })
 }
 
-async function sheduler() {
+function sheduler() {
   let isBusy = false
-    setInterval(async () => {
+
+  setInterval(async () => {
+    if (!isBusy) {
       console.log('lul')
-      if (!isBusy) {
-        isBusy = true
-        await getPostTitles()
-        await send_news_groups()
-        await delete_old_news()
-        isBusy = false
-      }
-    }, 10 * 1000)
+      isBusy = true
+      console.log('1')
+      await getPostTitles()
+      console.log('2')
+      await send_news_groups()
+      console.log('3')
+      await delete_old_news()
+      console.log('4')
+      isBusy = false
+    } else {
+      console.log('not lul')
+    }
+  }, 60 * 1000)
 }
 
 sheduler()

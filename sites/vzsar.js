@@ -2,15 +2,25 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const iconv = require('iconv-lite');
 
+function delay(ms) {
+  return new Promise( resolve => setTimeout(resolve, ms) );
+}
 
-module.exports = async function getPosts(site, $) {
+module.exports = async function getPosts(site, all_posts) {
+  const { data } = await axios.get(
+    site.url
+  );
+  const $ = cheerio.load(data);
     const postTitles = []
     let res = []
     $('.newslist > a').each( (_i , el ) => {
       const postTitle = $(el).attr('href')
-      postTitles.push(postTitle?postTitle:"") 
+      if (all_posts.filter(el => el.url == 'https://www.vzsar.ru' + postTitle).length < 1) {
+        postTitles.push(postTitle?postTitle:"")
+      }
     });
-    await Promise.all(postTitles.map(async (sitepost) => {
+    await postTitles.reduce(async (memo, sitepost) => {
+      await memo
       try {
         const response = await axios.get('https://www.vzsar.ru' + sitepost, { responseType: 'arraybuffer' });
         const data = iconv.decode(response.data, 'win1251'); // блядская адская поебота
@@ -48,10 +58,11 @@ module.exports = async function getPosts(site, $) {
           old: false,
         });
 
-      } catch {
-        console.log("poebatb")
+      } catch(e) {
+        console.log("poebatb",e)
       }
-    }))
+      await delay(1 * 1000)
+    }, Promise.resolve())
     return res
       
 }
