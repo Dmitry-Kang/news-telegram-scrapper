@@ -27,16 +27,16 @@ async function getPostTitles() {
     let res = [];
     await Promise.all(sites.map(async site => {
       console.log('1:',site)
-      if (site.name === "omskinform") { // омск1 omskinform
-        res = await getPostsFromOmskInform(site, all_posts)
-      } else if (site.name === "uralweb") { // ural
-        res = await getPostsFromUralWeb(site, all_posts)
-      } else if (site.name === "vzsar") { // vzsar
-        res = await getPostsFromVzsar(site, all_posts)
-      } else if (site.name === "rostovgazeta") { // rostovgazeta
-        res = await getPostsFromRostovGazeta(site, all_posts)
-      } else if (site.name === "sarnovosti") { // sarnovosti
-        res = await getPostsFromSarnovosti(site, all_posts)
+      if (site.name == "omskinform") { // омск1 omskinform
+        Array.prototype.push.apply(res, await getPostsFromOmskInform(site, all_posts))
+      } else if (site.name == "uralweb") { // ural
+        Array.prototype.push.apply(res, await getPostsFromUralWeb(site, all_posts))
+      } else if (site.name == "vzsar") { // vzsar
+        Array.prototype.push.apply(res, await getPostsFromVzsar(site, all_posts))
+      } else if (site.name == "rostovgazeta") { // rostovgazeta
+        Array.prototype.push.apply(res, await getPostsFromRostovGazeta(site, all_posts))
+      } else if (site.name == "sarnovosti") { // sarnovosti
+        Array.prototype.push.apply(res, await getPostsFromSarnovosti(site, all_posts))
       }
       console.log('1:',site, "finish")
     }))
@@ -45,7 +45,8 @@ async function getPostTitles() {
       skipDuplicates: true
     })
 	} catch (error) {
-    console.log('ree')
+    await delay(1000)
+    await bot.telegram.sendMessage(process.env.DEVELOPER_ID, String(e), {disable_web_page_preview: true})
 		throw error;
 	}
 };
@@ -89,7 +90,7 @@ async function send_news_groups() {
 }
 
 async function send_shit(post, chatId) {
-  await bot.telegram.sendMessage(chatId, `Пост ${post.id}`, {disable_web_page_preview: true}) // айди поста
+  await bot.telegram.sendMessage(chatId, `⭐️Пост ${post.id}\n\n${post.url}`, {disable_web_page_preview: true}) // айди поста
   await delay(1000)
 
   if (post.img.length > 0) { // фото или видео
@@ -108,7 +109,7 @@ async function send_shit(post, chatId) {
   await delay(1000)
 
   const jsontext = JSON.parse(post.text).text // заголовок, текст, ссылка и источник
-  const text = (`${post.title}\n\n${jsontext}\n\n${post.url}\n\n${post.istochnik}`)
+  const text = (`${post.title}\n\n${jsontext}${post.istochnik}`)
   if (text.length > 4096) {
     for (let i = 0; i < text.length; i += 4096) {
       await bot.telegram.sendMessage(chatId, text.slice(i, i + 4096), {disable_web_page_preview: true})
@@ -134,20 +135,26 @@ function sheduler() {
   let isBusy = false
 
   setInterval(async () => {
-    if (!isBusy) {
-      console.log('lul')
-      isBusy = true
-      console.log('1')
-      await getPostTitles()
-      console.log('2')
-      await send_news_groups()
-      console.log('3')
-      await delete_old_news()
-      console.log('4')
-      isBusy = false
-    } else {
-      console.log('not lul')
+    try {
+      if (!isBusy) {
+        console.log('lul')
+        isBusy = true
+        console.log('1')
+        await getPostTitles()
+        console.log('2')
+        await send_news_groups()
+        console.log('3')
+        await delete_old_news()
+        console.log('4')
+        isBusy = false
+      } else {
+        console.log('not lul')
+      }
+    } catch(e) {
+      await delay(1000)
+      await bot.telegram.sendMessage(process.env.DEVELOPER_ID, String(e), {disable_web_page_preview: true})
     }
+    
   }, 60 * 1000)
 }
 

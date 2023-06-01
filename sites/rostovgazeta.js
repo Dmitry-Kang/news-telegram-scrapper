@@ -44,7 +44,7 @@ module.exports = async function getPosts(site, all_posts) {
         });
 
       } catch(e) {
-        console.log("poebatb",e)
+        // console.log("poebatb",e)
       }
       await delay(1 * 1000)
     }, Promise.resolve())
