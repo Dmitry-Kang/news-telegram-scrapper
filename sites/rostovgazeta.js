@@ -4,7 +4,8 @@ function delay(ms) {
   return new Promise( resolve => setTimeout(resolve, ms) );
 }
 
-module.exports = async function getPosts(site, all_posts) {
+module.exports = async function getPosts(site, all_posts, bot) {
+  try {
     const { data } = await axios.get(
       site.url
     );
@@ -44,10 +45,15 @@ module.exports = async function getPosts(site, all_posts) {
         });
 
       } catch(e) {
-        // console.log("poebatb",e)
+        await delay(1000)
+        await bot.telegram.sendMessage(process.env.DEVELOPER_ID, `rostovgazeta: https://rostovgazeta.ru${sitepost} ${String(e)}`, {disable_web_page_preview: true})
       }
       await delay(1 * 1000)
     }, Promise.resolve())
     return res
+  } catch(e) {
+    await delay(1000)
+    await bot.telegram.sendMessage(process.env.DEVELOPER_ID, `rostovgazeta: ${site} ${String(e)}`, {disable_web_page_preview: true})
+  }  
       
 }

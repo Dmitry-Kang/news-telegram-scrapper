@@ -28,15 +28,15 @@ async function getPostTitles() {
     await Promise.all(sites.map(async site => {
       console.log('1:',site)
       if (site.name == "omskinform") { // омск1 omskinform
-        Array.prototype.push.apply(res, await getPostsFromOmskInform(site, all_posts))
+        Array.prototype.push.apply(res, await getPostsFromOmskInform(site, all_posts, bot))
       } else if (site.name == "uralweb") { // ural
-        Array.prototype.push.apply(res, await getPostsFromUralWeb(site, all_posts))
+        Array.prototype.push.apply(res, await getPostsFromUralWeb(site, all_posts, bot))
       } else if (site.name == "vzsar") { // vzsar
-        Array.prototype.push.apply(res, await getPostsFromVzsar(site, all_posts))
+        Array.prototype.push.apply(res, await getPostsFromVzsar(site, all_posts, bot))
       } else if (site.name == "rostovgazeta") { // rostovgazeta
-        Array.prototype.push.apply(res, await getPostsFromRostovGazeta(site, all_posts))
+        Array.prototype.push.apply(res, await getPostsFromRostovGazeta(site, all_posts, bot))
       } else if (site.name == "sarnovosti") { // sarnovosti
-        Array.prototype.push.apply(res, await getPostsFromSarnovosti(site, all_posts))
+        Array.prototype.push.apply(res, await getPostsFromSarnovosti(site, all_posts, bot))
       }
       console.log('1:',site, "finish")
     }))
@@ -44,10 +44,9 @@ async function getPostTitles() {
       data: res,
       skipDuplicates: true
     })
-	} catch (error) {
+	} catch (e) {
     await delay(1000)
-    await bot.telegram.sendMessage(process.env.DEVELOPER_ID, String(e), {disable_web_page_preview: true})
-		throw error;
+    await bot.telegram.sendMessage(process.env.DEVELOPER_ID, `getPostTitles: ${String(e)}`, {disable_web_page_preview: true})
 	}
 };
 
@@ -99,17 +98,23 @@ async function send_shit(post, chatId) {
     // })
     // await bot.telegram.sendMediaGroup(chatId, res)
     const images = post.img.join("\n")
-    await bot.telegram.sendMessage(chatId, `Картинки:\n${images}`, {disable_web_page_preview: true})
+    const images_text = `Картинки:\n${images}`
+    await send_long_msg(chatId, images_text)
   } 
   await delay(1000)
   if (post.video.length > 0) {
     const videos = post.video.join("\n")
-    await bot.telegram.sendMessage(chatId, `Видео:\n${videos}`, {disable_web_page_preview: true})
+    const videos_text = `Видео:\n${videos}`
+    await send_long_msg(chatId, videos_text)
   }
   await delay(1000)
 
   const jsontext = JSON.parse(post.text).text // заголовок, текст, ссылка и источник
   const text = (`${post.title}\n\n${jsontext}${post.istochnik}`)
+  await send_long_msg(chatId, text)
+}
+
+async function send_long_msg(chatId, text) {
   if (text.length > 4096) {
     for (let i = 0; i < text.length; i += 4096) {
       await bot.telegram.sendMessage(chatId, text.slice(i, i + 4096), {disable_web_page_preview: true})
@@ -151,8 +156,9 @@ function sheduler() {
         console.log('not lul')
       }
     } catch(e) {
+      isBusy = false
       await delay(1000)
-      await bot.telegram.sendMessage(process.env.DEVELOPER_ID, String(e), {disable_web_page_preview: true})
+      await bot.telegram.sendMessage(process.env.DEVELOPER_ID, `sheduler: ${String(e)}`, {disable_web_page_preview: true})
     }
     
   }, 60 * 1000)
