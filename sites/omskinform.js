@@ -54,7 +54,7 @@ module.exports = async function getPosts(site, all_posts, bot) {
           img: img, 
           video: video, 
           url: sitepost, 
-          istochnik:`Источник: omskinform.ru`, 
+          istochnik:`\n\nИсточник: omskinform.ru`, 
           siteid: site.id, 
           old: false
         })
