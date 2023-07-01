@@ -93,13 +93,18 @@ async function send_shit(post, chatId) {
   await delay(1000)
 
   if (post.img.length > 0) { // фото или видео
-    // let res:MediaGroup = post.img.map((el:string) => { // высылать именно картинками
+    const imgLeng = Math.min(post.img.length, 10) // высылать именно картинками
+    let res = []
+    for (let i = 0; i < imgLeng; i++) {
+      res.push({type: 'photo', media: post.img[i]})
+    }
+    // let res = post.img.map((el) => { // высылать именно картинками
     //   return {type: 'photo', media: el}
     // })
-    // await bot.telegram.sendMediaGroup(chatId, res)
-    const images = post.img.join("\n")
-    const images_text = `Картинки:\n${images}`
-    await send_long_msg(chatId, images_text)
+    await bot.telegram.sendMediaGroup(chatId, res)
+    // const images = post.img.join("\n")
+    // const images_text = `Картинки:\n${images}`
+    // await send_long_msg(chatId, images_text)
   } 
   await delay(1000)
   if (post.video.length > 0) {
