@@ -92,7 +92,8 @@ async function send_shit(post, chatId) {
   await bot.telegram.sendMessage(chatId, `⭐️Пост ${post.id}\n\n${post.url}`, {disable_web_page_preview: true}) // айди поста
   await delay(1000)
 
-  if (post.img.length > 0) { // фото или видео
+  // фото или видео
+  if (post.img.length > 0) { 
     const imgLeng = Math.min(post.img.length, 10) // высылать именно картинками
     let res = []
     for (let i = 0; i < imgLeng; i++) {
@@ -105,8 +106,8 @@ async function send_shit(post, chatId) {
     // const images = post.img.join("\n")
     // const images_text = `Картинки:\n${images}`
     // await send_long_msg(chatId, images_text)
+    await delay(10000)
   } 
-  await delay(1000)
   if (post.video.length > 0) {
     const videos = post.video.join("\n")
     const videos_text = `Видео:\n${videos}`
