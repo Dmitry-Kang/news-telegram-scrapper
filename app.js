@@ -89,19 +89,19 @@ async function send_news_groups() {
 }
 
 async function send_shit(post, chatId) {
+  await delay(30000)
+
   await bot.telegram.sendMessage(chatId, `⭐️Пост ${post.id}\n\n${post.url}`, {disable_web_page_preview: true}) // айди поста
   await delay(1000)
 
   // фото или видео
   if (post.img.length > 0) { 
+    await delay(5000)
     const imgLeng = Math.min(post.img.length, 10) // высылать именно картинками
     let res = []
     for (let i = 0; i < imgLeng; i++) {
       res.push({type: 'photo', media: post.img[i]})
     }
-    // let res = post.img.map((el) => { // высылать именно картинками
-    //   return {type: 'photo', media: el}
-    // })
     await bot.telegram.sendMediaGroup(chatId, res)
     // const images = post.img.join("\n")
     // const images_text = `Картинки:\n${images}`
