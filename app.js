@@ -164,7 +164,7 @@ function sheduler() {
     } catch(e) {
       isBusy = false
       await delay(1000)
-      await bot.telegram.sendMessage(process.env.DEVELOPER_ID, `sheduler: ${String(e)}`, {disable_web_page_preview: true})
+      await bot.telegram.sendMessage(process.env.DEVELOPER_ID, `sheduler: ${String(e)}\n${String(e.message)}`, {disable_web_page_preview: true})
     }
     
   }, 60 * 1000)
