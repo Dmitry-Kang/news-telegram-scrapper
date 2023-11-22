@@ -70,20 +70,24 @@ async function send_news_groups() {
   await posts.reduce(async (memo, post) => {
     await memo;
     let chatId;
-    if (post.siteid === 1) { //омск 1 omskinform -1001911238782
-      chatId = "-1001911238782"
-    } else if (post.siteid === 2) { // урал екб 1 -1001924665554
-      chatId = "-1001924665554"
-    } else if (post.siteid === 3) { // саратов 1 -1001934213159
-      chatId = "-1001934213159"
-    } else if (post.siteid === 4) { // rostov -1001956243574
-      chatId = "-1001956243574"
-    } else if (post.siteid === 5) { // rostov 2 -1001946671569
-      chatId = "-1001946671569"
+    try {
+      if (post.siteid === 1) { //омск 1 omskinform -1001911238782
+        chatId = "-1001911238782"
+      } else if (post.siteid === 2) { // урал екб 1 -1001924665554
+        chatId = "-1001924665554"
+      } else if (post.siteid === 3) { // саратов 1 -1001934213159
+        chatId = "-1001934213159"
+      } else if (post.siteid === 4) { // rostov -1001956243574
+        chatId = "-1001956243574"
+      } else if (post.siteid === 5) { // rostov 2 -1001946671569
+        chatId = "-1001946671569"
+      }
+      await send_shit(post, chatId)
+      await delay(5 * 1000)
+    } catch(e) {
+      await delay(1000)
+      await bot.telegram.sendMessage(process.env.DEVELOPER_ID, `send_news_groups: ${String(e)}\n${String(e.message)}\n\nchatid: ${chatId}\n\npost: ${post}`, {disable_web_page_preview: true})
     }
-    await send_shit(post, chatId)
-    await delay(5 * 1000)
-
   }, Promise.resolve())
   
 }
