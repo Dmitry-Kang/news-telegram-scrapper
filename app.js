@@ -8,7 +8,15 @@ const getPostsFromUralWeb = require('./sites/uralweb');
 const getPostsFromVzsar = require('./sites/vzsar');
 const getPostsFromRostovGazeta = require('./sites/rostovgazeta');
 const getPostsFromSarnovosti = require('./sites/sarnovosti');
+const getPostsFromInkazan = require('./sites/inkazan');
+const getPostsFromNewsnn = require('./sites/newsnn');
+const getPostsFromNnov = require('./sites/nnov');
+const getPostsFromKuban = require('./sites/kuban');
+const getPostsFromKazan = require('./sites/kazan');
 dotenv.config();
+
+const debug = Boolean(process.env.DEBUG)
+console.log("Debug:", debug)
 
 let options = {
   channelMode: true    // Handle `channel_post` updates as messages (optional)
@@ -37,6 +45,16 @@ async function getPostTitles() {
         Array.prototype.push.apply(res, await getPostsFromRostovGazeta(site, all_posts, bot))
       } else if (site.name == "sarnovosti") { // sarnovosti
         Array.prototype.push.apply(res, await getPostsFromSarnovosti(site, all_posts, bot))
+      } else if (site.name == "inkazan") { // inkazan
+        Array.prototype.push.apply(res, await getPostsFromInkazan(site, all_posts, bot))
+      } else if (site.name == "newsnn") { // newsnn
+        Array.prototype.push.apply(res, await getPostsFromNewsnn(site, all_posts, bot))
+      } else if (site.name == "nnov") { // nnov
+        Array.prototype.push.apply(res, await getPostsFromNnov(site, all_posts, bot))
+      } else if (site.name == "kuban") { // kuban
+        Array.prototype.push.apply(res, await getPostsFromKuban(site, all_posts, bot))
+      } else if (site.name == "kazan") { // kazan
+        Array.prototype.push.apply(res, await getPostsFromKazan(site, all_posts, bot))
       }
       console.log('1:',site, "finish")
     }))
@@ -81,7 +99,17 @@ async function send_news_groups() {
         chatId = "-1001956243574"
       } else if (post.siteid === 5) { // rostov 2 -1001946671569
         chatId = "-1001946671569"
-      }
+      } else if (post.siteid === 6) {// inkazan 1 -1002010869886
+        chatId = "-1002010869886"
+      } else if (post.siteid === 7) {// newsnn 1 -1002025231170
+        chatId = "-1002025231170"
+      } else if (post.siteid === 8) { // kuban.kp -1001915461330
+        chatId = "-1001915461330"
+      } else if (post.siteid === 9) { // kazan.kp -1002120245961
+        chatId = "-1002120245961"
+      } else if (post.siteid === 10) { // nnov.kp -1002104369856
+        chatId = "-1002104369856"
+      } 
       await send_shit(post, chatId)
       await delay(5 * 1000)
     } catch(e) {
@@ -146,32 +174,47 @@ async function delete_old_news() {
   })
 }
 
-function sheduler() {
+async function sheduler() {
   let isBusy = false
-
-  setInterval(async () => {
+  if (debug) {
     try {
-      if (!isBusy) {
-        console.log('lul')
-        isBusy = true
-        console.log('1')
-        await getPostTitles()
-        console.log('2')
-        await send_news_groups()
-        console.log('3')
-        await delete_old_news()
-        console.log('4')
-        isBusy = false
-      } else {
-        console.log('not lul')
-      }
+      console.log('lul')
+      console.log('1')
+      await getPostTitles()
+      console.log('2')
+      await send_news_groups()
+      console.log('3')
+      await delete_old_news()
+      console.log('4')
     } catch(e) {
-      isBusy = false
       await delay(1000)
       await bot.telegram.sendMessage(process.env.DEVELOPER_ID, `sheduler: ${String(e)}\n${String(e.message)}`, {disable_web_page_preview: true})
     }
-    
-  }, 60 * 1000)
+  } else {
+    setInterval(async () => {
+      try {
+        if (!isBusy) {
+          console.log('lul')
+          isBusy = true
+          console.log('1')
+          await getPostTitles()
+          console.log('2')
+          await send_news_groups()
+          console.log('3')
+          await delete_old_news()
+          console.log('4')
+          isBusy = false
+        } else {
+          console.log('not lul')
+        }
+      } catch(e) {
+        isBusy = false
+        await delay(1000)
+        await bot.telegram.sendMessage(process.env.DEVELOPER_ID, `sheduler: ${String(e)}\n${String(e.message)}`, {disable_web_page_preview: true})
+      }
+      
+    }, 60 * 1000)
+  }
 }
 
 sheduler()

@@ -26,6 +26,9 @@ module.exports = async function getPosts(site, all_posts, bot) {
         const title = $(".MatterTop_title__fNgrs").text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/g, ' ').trim();
 
         let text = "";
+        $(".leading-relaxed.font-semibold").each(function (i, elem) {
+          text += $(this).text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/gm,"\n\n") + '\n\n';
+        });
         $(".Common_common__MfItd > p").each(function (i, elem) {
           text += $(this).text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/gm,"\n\n") + '\n\n';
         });

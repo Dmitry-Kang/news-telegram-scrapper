@@ -15,14 +15,14 @@ module.exports = async function getPosts(site, all_posts, bot) { // todo module 
     let res = []
     $('.mb-8 > a').each( (_i , el ) => {
       const postTitle = $(el).attr('href')
-      if (postTitle && all_posts.filter(el => el.url == "https://inkazan.ru" + postTitle).length < 1) {
+      if (postTitle && all_posts.filter(el => el.url == "https://newsnn.ru" + postTitle).length < 1) {
         postTitles.push(postTitle)
       }
     });
     await postTitles.reduce(async (memo, sitepost) => {
       await memo
       try {
-        const { data } = await axios.get("https://inkazan.ru" + sitepost);
+        const { data } = await axios.get("https://newsnn.ru" + sitepost);
         const $ = cheerio.load(data);
         const title = $(".MatterTop_title__fNgrs").text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/g, ' ').trim();
 
@@ -35,15 +35,15 @@ module.exports = async function getPosts(site, all_posts, bot) { // todo module 
         });
         text = text.replace(/\s{2,}/gm,"\n\n") 
         
-        let img = ["https://inkazan.ru" + $(".MatterTop_layer__c__zR").first().attr("src")]; // todo только первый потомушто картинка это бекграунд и больше нету
+        let img = ["https://newsnn.ru" + $(".MatterTop_layer__c__zR").first().attr("src")]; // todo только первый потомушто картинка это бекграунд и больше нету
 
         res.push({
           title,
           text: JSON.stringify({ text: text }),
           img: img, 
           video: [],
-          url: "https://inkazan.ru" + sitepost,
-          istochnik:`Источник: inkazan.ru`,
+          url: "https://newsnn.ru" + sitepost,
+          istochnik:`Источник: newsnn.ru`,
           siteid: site.id,
           old: false,
         });

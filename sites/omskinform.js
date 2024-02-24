@@ -13,7 +13,7 @@ module.exports = async function getPosts(site, all_posts, bot) {
     const $ = cheerio.load(data);
     const postTitles = []
     let res = []
-    $('.n_news > a').each( (_i , el ) => {
+    $('[itemtype="http://schema.org/NewsArticle"] a').each( (_i , el ) => {
       const postTitle = $(el).attr('href')
       if (all_posts.filter(el => el.url == postTitle).length < 1) {
         postTitles.push(postTitle?postTitle:"")
@@ -25,36 +25,41 @@ module.exports = async function getPosts(site, all_posts, bot) {
       try {
         const { data } = await axios.get(sitepost);
         const $ = cheerio.load(data);
-        const title = $('.n_cap_lnk_one').text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/g, ' ').trim();
-        let text = $('.n_text_lnk > p').text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/gm,"\n\n").trim();
+        const title = $('main > div[class*=\'-desktop\'] [itemprop="headline"] > a').text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/g, ' ').trim();
+        // const subTitle = $('main > div[class*=\'-desktop\'] [itemprop="headline"] > a').text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/g, ' ').trim();
+        let text = $('main > div[class*=\'-desktop\'] [itemprop="articleBody"] > p, main > div[class*=\'-desktop\'] [itemprop="articleBody"] > blockquote > p').text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/gm,"\n\n").trim();
         
         let img = [];
-        $('.nt_img_handler img').each(function (i, elem) {
+        $('main > div[class*=\'-desktop\'] [itemprop="articleBody"] img').each(function (i, elem) {
           const el = $(this).attr('src')
           if (!!el) {
-            img.push(el)
+            if (img.filter(elem => elem == el).length < 1) {
+              img.push(el)
+            }
           }
         })
         let video = [];
-        $('.n_text_lnk > div > iframe').each(function (i, elem) {
+        $('main > div[class*=\'-desktop\'] [itemprop="articleBody"] iframe').each(function (i, elem) {
           const el = $(this).attr('src')
           if (!!el) {
-            video.push(el)
+            if (video.filter(elem => elem == el).length < 1) {
+              video.push(el)
+            }
           }
         })
-        $('.n_text_lnk > p > iframe').each(function (i, elem) {
-          const el = $(this).attr('src')
-          if (!!el) {
-            video.push(el)
-          }
-        })
+        // $('.n_text_lnk > p > iframe').each(function (i, elem) {
+        //   const el = $(this).attr('src')
+        //   if (!!el) {
+        //     video.push(el)
+        //   }
+        // })
         res.push({
           title, 
           text: JSON.stringify({text: text}), 
           img: img, 
           video: video, 
           url: sitepost, 
-          istochnik:`\n\nИсточник: omskinform.ru`, 
+          istochnik:`\n\nНовости без цензуры (18+) в нашем телеграм-канале t.me/+AKYwBOwDQpY3ZGIy`, 
           siteid: site.id, 
           old: false
         })
@@ -71,3 +76,7 @@ module.exports = async function getPosts(site, all_posts, bot) {
     await bot.telegram.sendMessage(process.env.DEVELOPER_ID, `Omskinform: ${site} ${String(e)}`, {disable_web_page_preview: true})
   }   
 }
+
+// (async() => {
+//   const res = await getPosts()
+// })

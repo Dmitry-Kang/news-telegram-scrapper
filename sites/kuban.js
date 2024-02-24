@@ -13,37 +13,37 @@ module.exports = async function getPosts(site, all_posts, bot) { // todo module 
     const $ = cheerio.load(data);
     const postTitles = []
     let res = []
-    $('.mb-8 > a').each( (_i , el ) => {
+    $('.sc-1tputnk-13.ixDVFm > div > a.sc-1tputnk-2').each( (_i , el ) => {
       const postTitle = $(el).attr('href')
-      if (postTitle && all_posts.filter(el => el.url == "https://inkazan.ru" + postTitle).length < 1) {
+      if (postTitle && all_posts.filter(el => el.url == "https://www.kuban.kp.ru" + postTitle).length < 1) {
         postTitles.push(postTitle)
       }
     });
     await postTitles.reduce(async (memo, sitepost) => {
       await memo
       try {
-        const { data } = await axios.get("https://inkazan.ru" + sitepost);
+        const { data } = await axios.get("https://www.kuban.kp.ru" + sitepost);
         const $ = cheerio.load(data);
-        const title = $(".MatterTop_title__fNgrs").text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/g, ' ').trim();
+        const title = $(".sc-j7em19-3.eyeguj").text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/g, ' ').trim();
 
         let text = "";
-        $(".leading-relaxed.font-semibold").each(function (i, elem) {
+        $(".sc-j7em19-4.nFVxV").each(function (i, elem) {
           text += $(this).text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/gm,"\n\n") + '\n\n';
         });
-        $(".Common_common__MfItd > p").each(function (i, elem) {
+        $("p.sc-1wayp1z-16.dqbiXu").each(function (i, elem) {
           text += $(this).text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/gm,"\n\n") + '\n\n';
         });
         text = text.replace(/\s{2,}/gm,"\n\n") 
         
-        let img = ["https://inkazan.ru" + $(".MatterTop_layer__c__zR").first().attr("src")]; // todo только первый потомушто картинка это бекграунд и больше нету
+        let img = [$(".sc-1wayp1z-2.bqNMcR .sc-foxktb-1.cYprnQ").first().attr("src")]; // todo только первый потомушто картинка это бекграунд и больше нету
 
         res.push({
           title,
           text: JSON.stringify({ text: text }),
           img: img, 
           video: [],
-          url: "https://inkazan.ru" + sitepost,
-          istochnik:`Источник: inkazan.ru`,
+          url: "https://www.kuban.kp.ru" + sitepost,
+          istochnik:`Источник: www.kuban.kp.ru`,
           siteid: site.id,
           old: false,
         });

@@ -27,7 +27,7 @@ module.exports = async function getPosts(site, all_posts, bot) {
         const title = $(".clearfix .ni-htext h1").text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/g, ' ').trim();
 
         let text = ""; // тест до картинки
-        $(".n-ict.clearfix > p").each(function (i, elem) {
+        $(".n-ict.clearfix > p, .n-ict.clearfix > blockquote > p").each(function (i, elem) {
           text += $(this).text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/gm,"\n\n") + '\n\n';
         });
         text = text.replace(/\s{2,}/gm,"\n\n") 
