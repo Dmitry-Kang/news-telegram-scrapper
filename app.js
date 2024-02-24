@@ -89,19 +89,19 @@ async function send_news_groups() {
     await memo;
     let chatId;
     try {
-      if (post.siteid === 1) { //омск 1 omskinform -1001911238782
+      if (post.siteid === 1) { // омск omskinform -1001911238782
         chatId = "-1001911238782"
-      } else if (post.siteid === 2) { // урал екб 1 -1001924665554
+      } else if (post.siteid === 2) { // урал екб uralweb 1 -1001924665554
         chatId = "-1001924665554"
-      } else if (post.siteid === 3) { // саратов 1 -1001934213159
+      } else if (post.siteid === 3) { // саратов vzsar -1001934213159
         chatId = "-1001934213159"
-      } else if (post.siteid === 4) { // rostov -1001956243574
+      } else if (post.siteid === 4) { // rostov rostovgazeta -1001956243574
         chatId = "-1001956243574"
-      } else if (post.siteid === 5) { // rostov 2 -1001946671569
+      } else if (post.siteid === 5) { // saratov sarnovosti -1001946671569
         chatId = "-1001946671569"
-      } else if (post.siteid === 6) {// inkazan 1 -1002010869886
+      } else if (post.siteid === 6) {// inkazan -1002010869886
         chatId = "-1002010869886"
-      } else if (post.siteid === 7) {// newsnn 1 -1002025231170
+      } else if (post.siteid === 7) {// newsnn -1002025231170
         chatId = "-1002025231170"
       } else if (post.siteid === 8) { // kuban.kp -1001915461330
         chatId = "-1001915461330"
