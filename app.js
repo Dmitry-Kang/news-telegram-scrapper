@@ -220,7 +220,14 @@ async function sheduler() {
 sheduler()
 
 console.log("started bot")
-bot.launch();
+bot.launch({
+  retry: {
+      limit: Infinity,
+      interval: 1000,
+      // Функция, которая определяет, следует ли повторять попытку
+      condition: () => true
+  }
+});
 
 // Enable graceful stop
 process.once('SIGINT', () => bot.stop('SIGINT'));

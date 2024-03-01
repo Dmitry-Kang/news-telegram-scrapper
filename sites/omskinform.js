@@ -27,7 +27,7 @@ module.exports = async function getPosts(site, all_posts, bot) {
         const $ = cheerio.load(data);
         const title = $('main > div[class*=\'-desktop\'] [itemprop="headline"] > a').text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/g, ' ').trim();
         // const subTitle = $('main > div[class*=\'-desktop\'] [itemprop="headline"] > a').text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/g, ' ').trim();
-        let text = $('main > div[class*=\'-desktop\'] [itemprop="articleBody"] > p, main > div[class*=\'-desktop\'] [itemprop="articleBody"] > blockquote > p').text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/gm,"\n\n").trim();
+        let text = $('main > div[class*=\'-desktop\'] [itemprop="articleBody"] > p, main > div[class*=\'-desktop\'] [itemprop="articleBody"] > blockquote > p, main > div[class*=\'-desktop\'] [itemprop="articleBody"] > div').text().trim().replace(/\[.*\]/g, '').replace(/\s{2,}/gm,"\n\n").trim();
         
         let img = [];
         $('main > div[class*=\'-desktop\'] [itemprop="articleBody"] img').each(function (i, elem) {
