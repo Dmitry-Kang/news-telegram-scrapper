@@ -1,7 +1,7 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 const iconv = require('iconv-lite');
-const { checkShit } = require('../utils/utils')
+const checkShit = require('../utils/utils')
 
 function delay(ms) {
   return new Promise( resolve => setTimeout(resolve, ms) );

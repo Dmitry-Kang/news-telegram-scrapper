@@ -1,6 +1,6 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
-const { checkShit } = require('../utils/utils')
+const checkShit = require('../utils/utils')
 
 function delay(ms) {
   return new Promise( resolve => setTimeout(resolve, ms) );
