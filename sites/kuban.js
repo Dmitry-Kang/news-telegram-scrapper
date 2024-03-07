@@ -56,7 +56,7 @@ module.exports = async function getPosts(site, all_posts, bot) { // todo module 
           img: img, 
           video: [],
           url: "https://www.kuban.kp.ru" + sitepost,
-          istochnik:`Источник: www.kuban.kp.ru`,
+          istochnik:`Источник: Комсомольская Правда`,
           siteid: site.id,
           old: false,
         });
