@@ -176,45 +176,29 @@ async function delete_old_news() {
 
 async function sheduler() {
   let isBusy = false
-  if (debug) {
+  setInterval(async () => {
     try {
-      console.log('lul')
-      console.log('1')
-      await getPostTitles()
-      console.log('2')
-      await send_news_groups()
-      console.log('3')
-      await delete_old_news()
-      console.log('4')
+      if (!isBusy) {
+        console.log('lul')
+        isBusy = true
+        console.log('1')
+        await getPostTitles()
+        console.log('2')
+        await send_news_groups()
+        console.log('3')
+        await delete_old_news()
+        console.log('4')
+        isBusy = false
+      } else {
+        console.log('not lul')
+      }
     } catch(e) {
+      isBusy = false
       await delay(1000)
       await bot.telegram.sendMessage(process.env.DEVELOPER_ID, `sheduler: ${String(e)}\n${String(e.message)}`, {disable_web_page_preview: true})
     }
-  } else {
-    setInterval(async () => {
-      try {
-        if (!isBusy) {
-          console.log('lul')
-          isBusy = true
-          console.log('1')
-          await getPostTitles()
-          console.log('2')
-          await send_news_groups()
-          console.log('3')
-          await delete_old_news()
-          console.log('4')
-          isBusy = false
-        } else {
-          console.log('not lul')
-        }
-      } catch(e) {
-        isBusy = false
-        await delay(1000)
-        await bot.telegram.sendMessage(process.env.DEVELOPER_ID, `sheduler: ${String(e)}\n${String(e.message)}`, {disable_web_page_preview: true})
-      }
-      
-    }, 60 * 1000)
-  }
+    
+  }, 60 * 1000)
 }
 
 sheduler()

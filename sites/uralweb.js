@@ -55,7 +55,7 @@ module.exports = async function getPosts(site, all_posts, bot) {
           img: img, 
           video: video,
           url: "https://www.uralweb.ru" + sitepost,
-          istochnik:`Источник: uralweb.ru`,
+          istochnik:`Источник: uralweb`,
           siteid: site.id,
           old: false,
         });

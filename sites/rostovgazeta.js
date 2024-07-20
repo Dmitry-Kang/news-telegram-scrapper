@@ -44,7 +44,7 @@ module.exports = async function getPosts(site, all_posts, bot) {
           img: img, 
           video: [],
           url: "https://rostovgazeta.ru" + sitepost,
-          istochnik:`Источник: rostovgazeta.ru`,
+          istochnik:`Источник: Ростов Газета`,
           siteid: site.id,
           old: false,
         });

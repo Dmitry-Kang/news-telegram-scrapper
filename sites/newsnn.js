@@ -44,7 +44,7 @@ module.exports = async function getPosts(site, all_posts, bot) { // todo module 
           img: img, 
           video: [],
           url: "https://newsnn.ru" + sitepost,
-          istochnik:`Источник: newsnn.ru`,
+          istochnik:`Источник: NewsNN`,
           siteid: site.id,
           old: false,
         });
