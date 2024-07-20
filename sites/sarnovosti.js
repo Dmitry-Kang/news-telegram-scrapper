@@ -55,7 +55,7 @@ module.exports = async function getPosts(site, all_posts, bot) {
           img: img, 
           video: video,
           url: "https://sarnovosti.ru" + sitepost,
-          istochnik:`Источник: регион64`,
+          istochnik:`Источник: регион64\nФото: регион64`,
           siteid: site.id,
           old: false,
         });

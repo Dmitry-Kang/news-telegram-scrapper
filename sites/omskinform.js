@@ -60,7 +60,7 @@ module.exports = async function getPosts(site, all_posts, bot) {
           img: img, 
           video: video, 
           url: sitepost, 
-          istochnik:`\n\nНовости без цензуры (18+) в нашем телеграм-канале t.me/+AKYwBOwDQpY3ZGIy`, 
+          istochnik:`\n\nИсточник: omskinform\nФото: omskinform`, 
           siteid: site.id, 
           old: false
         })

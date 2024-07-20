@@ -44,7 +44,7 @@ module.exports = async function getPosts(site, all_posts, bot) { // todo module 
           img: img, 
           video: [],
           url: "https://inkazan.ru" + sitepost,
-          istochnik:`Источник: inkazan.ru`,
+          istochnik:`Источник: inkazan\nФото: inkazan`,
           siteid: site.id,
           old: false,
         });
