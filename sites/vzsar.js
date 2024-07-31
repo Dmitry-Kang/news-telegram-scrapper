@@ -55,7 +55,7 @@ module.exports = async function getPosts(site, all_posts, bot) {
           img: img, 
           video: [], // todo не нашел новостей с видео
           url: "https://vzsar.ru" + sitepost,
-          istochnik:`Источник: взгляд инфо\nФото: взгляд инфо`,
+          istochnik:`Источник: взгляд инфо\nФото: взгляд инфо\n\nНовости без цензуры (18+) в нашем телеграм-канале 👉 https://t.me/+0zrzqRdwUNcxODcy`,
           siteid: site.id,
           old: false,
         });
